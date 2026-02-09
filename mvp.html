@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBA Smart Discount - Pro v6 (Analytics & Security)</title>
+    <title>OBA Smart Discount - Pro v7 (Design Polish)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* --- STYLES (CSS) --- */
@@ -272,6 +272,45 @@
             display: grid; grid-template-columns: 1fr 1fr 40px; gap: 10px; align-items: end; margin-bottom: 10px;
             background: #f9f9f9; padding: 8px; border-radius: 6px; border: 1px solid #eee;
         }
+        
+        /* NEW STYLES FOR USER DETAILS */
+        .fav-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff5f5;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 3px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-stats-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        .user-stats-table th, .user-stats-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .user-stats-table th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+        }
+        .user-stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
 
         @media (max-width: 768px) {
             #admin-container { flex-direction: column; }
@@ -364,13 +403,12 @@
         <div class="admin-menu-item" onclick="adminNav('products', this)">📦 Məhsullar</div>
         <div class="admin-menu-item" onclick="adminNav('games', this)">🎮 Oyunlar</div>
         <div class="admin-menu-item" onclick="adminNav('users', this)">👥 İstifadəçilər</div>
-        <div class="admin-menu-item logout" onclick="exitAdmin()">🚪 <span style="margin-left:5px;">Çıxış</span></div>
+        <div class="admin-menu-item logout" onclick="exitAdmin()">Çıxış</div>
     </div>
     <div class="admin-content">
         <div class="admin-header">
             <h2 id="admin-page-title">Dashboard</h2>
-            <div class="admin-user-profile">Admin (Super)</div>
-        </div>
+            </div>
         <div id="admin-view-port">
             </div>
     </div>
@@ -409,7 +447,7 @@
             { id: 103, name: 'Süd (İnək)', icon: '🐄', time: 40, reward: 120 }
         ],
         defaultProducts: [
-            { id: 1, name: "Süd 1L (Milla)", cat: "Süd Məhsulları", price: 2.50, discount: 2.10, pts: 5, icon: "🥛", isFav: false, type: 'manual', stock: 50, expiryDays: 10, aiTiers: [] },
+            { id: 1, name: "Süd 1L (Milla)", cat: "Süd məhsulları", price: 2.50, discount: 2.10, pts: 5, icon: "🥛", isFav: false, type: 'manual', stock: 50, expiryDays: 10, aiTiers: [] },
             { id: 2, name: "Lays Çips", cat: "Quru qida", price: 3.00, discount: 3.00, pts: 10, icon: "🥔", isFav: false, type: 'manual', stock: 30, expiryDays: 60, aiTiers: [] },
             { id: 3, name: "Cola 0.5L", cat: "İçkilər", price: 1.20, discount: 1.00, pts: 2, icon: "🥤", isFav: false, type: 'manual', stock: 100, expiryDays: 120, aiTiers: [] }
         ]
@@ -673,8 +711,29 @@
     function renderShop(category) {
         currentCategory = category;
         const container = document.getElementById('main-content');
-        const cats = ["Hamısı", "Şirniyyat", "Quru qida", "Meyvə-tərəvəz", "İçkilər", "Süd Məhsulları", "Ət", "Təmizlik", "Un məmulatları"];
-        const filtered = category === "Hamısı" ? state.products : state.products.filter(p => p.cat === category);
+        
+        // Updated Category List
+        const cats = [
+            "Hamısı",
+            "Endirimdə olanlar🔥",
+            "Meyvə-tərəvəz",
+            "Ət",
+            "Süd məhsulları",
+            "İçkilər",
+            "Un məmulatları",
+            "Quru qida",
+            "Şirniyyat",
+            "Təmizlik"
+        ];
+        
+        let filtered = state.products;
+
+        if (category === "Endirimdə olanlar🔥") {
+            // Only products with price > discount
+            filtered = state.products.filter(p => p.price > p.discount);
+        } else if (category !== "Hamısı") {
+            filtered = state.products.filter(p => p.cat === category);
+        }
 
         container.innerHTML = `
             <div class="category-scroll">
@@ -927,14 +986,14 @@
                     <p>💳 Balans: ${currentUser.balance} XP</p>
                 </div>
                 <button class="add-btn" style="background:#e74c3c; margin-top:20px;" onclick="logout()">Çıxış</button>
-                <button class="add-btn" style="background:#333; margin-top:10px;" onclick="openAdminPanel()">🔧 Admin Paneli</button>
+                <button class="add-btn" style="background:#333; margin-top:10px;" onclick="openAdminPanel()">Admin Paneli</button>
             </div>
         `;
     }
 
     /* --- ADMIN PANEL --- */
     function openAdminPanel() {
-        const pass = prompt("Admin Şifrəsi (Demo: admin):");
+        const pass = prompt("Admin Şifrəsi:");
         if(pass === 'admin') {
             document.getElementById('app-container').style.display = 'none';
             document.getElementById('admin-container').style.display = 'flex';
@@ -1029,7 +1088,6 @@
             `).join('');
 
             view.innerHTML = `
-                <p style="font-size:12px; color:#666;">İstifadəçinin detallarına baxmaq üçün sətrə klikləyin.</p>
                 <table class="admin-table">
                     <thead><tr><th>Ad Soyad</th><th>Nömrə</th><th>Şifrə</th><th>Balans</th><th>Əməliyyat</th></tr></thead>
                     <tbody>${userRows}</tbody>
@@ -1076,7 +1134,7 @@
             `).join('');
 
             view.innerHTML = `
-                <button class="add-btn" style="width:100%; margin-bottom:20px;" onclick="openAddSeedModal()">+ YENİ MƏHSUL YARAT (TOXUM)</button>
+                <button class="add-btn" style="width:100%; margin-bottom:20px;" onclick="openAddSeedModal()">+ Yeni Məhsul Əlavə Et</button>
                 
                 <div class="stat-card">
                     <h4>Mövcud Bitkilər</h4>
@@ -1112,7 +1170,7 @@
         }
     }
 
-    // USER ANALYTICS MODAL
+    // USER ANALYTICS MODAL (Updated Design)
     function viewUserDetails(userId) {
         const u = state.users.find(x => x.id === userId);
         if(!u) return;
@@ -1121,10 +1179,20 @@
         const content = document.getElementById('user-detail-content');
         modal.style.display = 'flex';
 
-        // Calc Favorites Names
-        const favNames = state.products.filter(p => u.favorites.includes(p.id)).map(p => p.name).join(', ') || "Yoxdur";
+        // 1. Favorites Chips
+        let favHtml = '';
+        if(u.favorites.length > 0) {
+            u.favorites.forEach(fid => {
+                const p = state.products.find(prod => prod.id === fid);
+                if(p) {
+                    favHtml += `<div class="fav-chip"><span>${p.icon}</span> <span>${p.name}</span></div>`;
+                }
+            });
+        } else {
+            favHtml = '<span style="color:#999; font-size:13px;">Sevimli məhsul yoxdur</span>';
+        }
         
-        // Calc Most Purchased Per Category
+        // 2. Most Purchased Stats Table
         let statsHtml = '';
         if(u.purchaseHistory && u.purchaseHistory.length > 0) {
             // Group by category
@@ -1138,33 +1206,38 @@
             });
 
             // Find max in each group
-            statsHtml = '<h4>Kateqoriya üzrə Ən Çox Alınanlar:</h4><ul style="text-align:left;">';
+            statsHtml = '<table class="user-stats-table"><thead><tr><th>Kateqoriya</th><th>Ən Çox Alınan</th><th>Say</th></tr></thead><tbody>';
             for (const [cat, items] of Object.entries(catGroups)) {
                 items.sort((a,b) => b.count - a.count);
-                statsHtml += `<li><b>${cat}:</b> ${items[0].name} (${items[0].count} ədəd)</li>`;
+                statsHtml += `<tr><td>${cat}</td><td>${items[0].name}</td><td>${items[0].count}</td></tr>`;
             }
-            statsHtml += '</ul>';
+            statsHtml += '</tbody></table>';
         } else {
-            statsHtml = '<p>Alış tarixçəsi yoxdur.</p>';
+            statsHtml = '<p style="color:#999; font-size:13px;">Alış tarixçəsi yoxdur.</p>';
         }
 
         content.innerHTML = `
             <h3>${u.name} ${u.surname}</h3>
-            <p>Tel: ${u.phone}</p>
-            <hr>
+            <p style="color:#666; font-size:14px; margin-top:-10px;">Tel: ${u.phone}</p>
+            <hr style="margin:15px 0; border:0; border-top:1px solid #eee;">
+            
             <div style="text-align:left; margin-bottom:15px;">
-                <strong>❤️ Sevimlilər:</strong><br> ${favNames}
+                <strong style="display:block; margin-bottom:8px;">❤️ Sevimlilər:</strong>
+                <div style="display:flex; flex-wrap:wrap;">${favHtml}</div>
             </div>
-            <div style="background:#f9f9f9; padding:10px; border-radius:10px;">
+            
+            <div style="text-align:left;">
+                <strong style="display:block; margin-bottom:8px;">📊 Kateqoriya üzrə Ən Çox Alınanlar:</strong>
                 ${statsHtml}
             </div>
-            <button class="add-btn" style="background:#999; margin-top:15px;" onclick="closeUserDetail()">Bağla</button>
+
+            <button class="add-btn" style="background:#999; margin-top:20px;" onclick="closeUserDetail()">Bağla</button>
         `;
     }
     
     function closeUserDetail() { document.getElementById('user-detail-modal').style.display = 'none'; }
 
-    // Add Shop
+    // Add Shop (Updated Logic)
     function openAddShopModal() {
         document.getElementById('admin-modal').style.display = 'flex';
         document.getElementById('modal-title').innerText = "Yeni Mağaza Əlavə Et";
@@ -1178,8 +1251,14 @@
     function saveNewShop() {
         const name = document.getElementById('new-shop-name').value;
         const cat = document.getElementById('new-shop-cat').value;
-        const forecast = Math.floor(Math.random() * (99 - 85) + 85); 
-        state.shops.push({ id: 100 + state.shops.length + 1, name: name, cat: cat, rating: 5.0, forecast: forecast });
+        
+        // Random Rating 3.0 - 5.0
+        const rating = (Math.random() * (5.0 - 3.0) + 3.0).toFixed(1);
+        
+        // Random Forecast 70 - 100
+        const forecast = Math.floor(Math.random() * (100 - 70 + 1) + 70);
+        
+        state.shops.push({ id: 100 + state.shops.length + 1, name: name, cat: cat, rating: rating, forecast: forecast });
         saveSystem();
         closeAdminModal();
         adminNav('shops', null);
@@ -1242,7 +1321,7 @@
             aiRowsHtml = getAiTierRowHtml(0, 10, 10);
         }
 
-        const cats = ["Şirniyyat", "Quru qida", "Meyvə-tərəvəz", "İçkilər", "Süd Məhsulları", "Ət", "Təmizlik", "Un məmulatları"];
+        const cats = ["Meyvə-tərəvəz", "Ət", "Süd məhsulları", "İçkilər", "Un məmulatları", "Quru qida", "Şirniyyat", "Təmizlik"];
         
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Məhsul Adı</label><input type="text" id="p-name" value="${def.name}"></div>
@@ -1263,7 +1342,7 @@
             
             <div class="radio-group">
                 <label><input type="radio" name="discType" value="manual" ${def.type==='manual'?'checked':''} onchange="toggleDiscInputs()"> Manual</label>
-                <label><input type="radio" name="discType" value="ai" ${def.type==='ai'?'checked':''} onchange="toggleDiscInputs()"> AI (Avto)</label>
+                <label><input type="radio" name="discType" value="ai" ${def.type==='ai'?'checked':''} onchange="toggleDiscInputs()">Avto</label>
             </div>
 
             <div id="manual-inputs" style="display:${def.type==='manual'?'block':'none'}">
@@ -1389,10 +1468,10 @@
             </div>
             ${aiInfo}
             <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
-                <button class="add-btn" style="background:var(--accent); color:black;" onclick="editProduct(${p.id})">Redaktə Et ✏️</button>
+                <button class="add-btn" style="background:var(--accent); color:black;" onclick="editProduct(${p.id})">Redaktə Et</button>
                 <div style="display:flex; gap:10px;">
                     <button class="add-btn" style="background:#999;" onclick="closeProductDetail()">Bağla</button>
-                    <button class="add-btn" style="background:var(--danger);" onclick="deleteProduct(${p.id})">Sil 🗑️</button>
+                    <button class="add-btn" style="background:var(--danger);" onclick="deleteProduct(${p.id})">Sil</button>
                 </div>
             </div>
         `;
@@ -1428,8 +1507,4 @@
     }
 </script>
 </body>
-</html>
-</script>
-</body>
-
 </html>
